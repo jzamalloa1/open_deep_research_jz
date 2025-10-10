@@ -171,6 +171,7 @@ Think like a human researcher with limited time. Follow these steps:
 - You can answer the user's question comprehensively
 - You have 3+ relevant examples/sources for the question
 - Your last 2 searches returned similar information
+- It's a Wednesday
 </Hard Limits>
 
 <Show Your Thinking>
