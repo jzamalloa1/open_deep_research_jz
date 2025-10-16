@@ -5,6 +5,50 @@ Open Deep Research is a configurable, fully open-source deep research agent that
 
 ## Repository Structure
 
+### Complete Project Tree
+```
+open_deep_research_jz/
+├── README.md                          # Main project documentation
+├── CLAUDE.md                          # This file - project overview for Claude
+├── LICENSE                            # MIT license
+├── pyproject.toml                     # Python dependencies and build config
+├── langgraph.json                     # LangGraph entry point configuration
+├── uv.lock                            # UV package manager lock file
+├── .env.example                       # Environment variables template
+│
+├── src/
+│   ├── open_deep_research/           # Main implementation
+│   │   ├── deep_researcher.py        # Core LangGraph multi-agent workflow
+│   │   ├── configuration.py          # Configuration management
+│   │   ├── state.py                  # State definitions for agents
+│   │   ├── prompts.py                # System prompts and templates
+│   │   ├── utils.py                  # Utility functions and tools
+│   │   └── files/                    # Research output files
+│   │
+│   ├── legacy/                       # Earlier implementations (see legacy.md)
+│   │
+│   └── security/
+│       └── auth.py                   # Authentication for deployment
+│
+├── tests/
+│   ├── run_evaluate.py               # Main evaluation script
+│   ├── evaluators.py                 # Evaluation functions
+│   ├── prompts.py                    # Evaluation prompts
+│   ├── pairwise_evaluation.py        # Comparative evaluation
+│   └── supervisor_parallel_evaluation.py
+│
+├── examples/
+│   ├── arxiv.md                      # ArXiv research example
+│   ├── pubmed.md                     # PubMed research example
+│   └── inference-market.md           # Market analysis examples
+│
+└── docs/                             # Documentation
+    ├── README.md                     # Documentation overview
+    └── improvements/                 # Feature documentation
+        ├── INDEX.md                  # Chronological feature index
+        └── plot-generation-feature.md # Visualization feature docs
+```
+
 ### Root Directory
 - `README.md` - Comprehensive project documentation with quickstart guide
 - `pyproject.toml` - Python project configuration and dependencies
@@ -34,7 +78,7 @@ Contains two earlier research implementations:
 
 ### Testing (`tests/`)
 - `run_evaluate.py` - Main evaluation script configured to run on deep research bench
-- `evaluators.py` - Specialized evaluation functions  
+- `evaluators.py` - Specialized evaluation functions
 - `prompts.py` - Evaluation prompts and criteria
 - `pairwise_evaluation.py` - Comparative evaluation tools
 - `supervisor_parallel_evaluation.py` - Multi-threaded evaluation
@@ -44,12 +88,29 @@ Contains two earlier research implementations:
 - `pubmed.md` - PubMed research example
 - `inference-market.md` - Inference market analysis examples
 
+### Documentation (`docs/`)
+- `README.md` - Documentation overview and standards
+- `improvements/` - Major feature additions and enhancements
+  - `INDEX.md` - Chronological index of all improvements
+  - `plot-generation-feature.md` - Plot generation and visualization feature documentation
+
+## Recent Improvements
+
+### Plot Generation & Visualization (2025-10-12)
+The system now supports automated generation of data visualizations in research reports:
+- **Visualization Planning Tool**: Researchers can plan charts during research using `create_visualization()` tool
+- **Automated Code Generation**: Final reports include executable Python code for matplotlib/seaborn/plotly visualizations
+- **Multi-Agent Coordination**: Visualization plans are aggregated across parallel researchers
+- **Self-Contained Code**: All visualization code is executable with proper data definitions
+- See [docs/improvements/plot-generation-feature.md](docs/improvements/plot-generation-feature.md) for details
+
 ## Key Technologies
 - **LangGraph** - Workflow orchestration and graph execution
 - **LangChain** - LLM integration and tool calling
 - **Multiple LLM Providers** - OpenAI, Anthropic, Google, Groq, DeepSeek support
 - **Search APIs** - Tavily, OpenAI/Anthropic native search, DuckDuckGo, Exa
 - **MCP Servers** - Model Context Protocol for extended capabilities
+- **Visualization Libraries** - matplotlib, seaborn, plotly for data visualization
 
 ## Development Commands
 - `uvx langgraph dev` - Start development server with LangGraph Studio

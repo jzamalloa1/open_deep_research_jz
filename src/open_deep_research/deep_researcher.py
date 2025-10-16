@@ -46,6 +46,7 @@ from open_deep_research.utils import (
     get_model_token_limit,
     get_notes_from_tool_calls,
     get_today_str,
+    get_visualization_plans_from_tool_calls,
     is_token_limit_exceeded,
     openai_websearch_called,
     remove_up_to_last_ai_message,
@@ -322,12 +323,20 @@ async def supervisor_tools(state: SupervisorState, config: RunnableConfig) -> Co
             
             # Aggregate raw notes from all research results
             raw_notes_concat = "\n".join([
-                "\n".join(observation.get("raw_notes", [])) 
+                "\n".join(observation.get("raw_notes", []))
                 for observation in tool_results
             ])
-            
+
             if raw_notes_concat:
                 update_payload["raw_notes"] = [raw_notes_concat]
+
+            # Aggregate visualization plans from all research results
+            viz_plans_concat = []
+            for observation in tool_results:
+                viz_plans_concat.extend(observation.get("visualization_plans", []))
+
+            if viz_plans_concat:
+                update_payload["visualization_plans"] = viz_plans_concat
                 
         except Exception as e:
             # Handle research execution errors
@@ -552,14 +561,18 @@ async def compress_research(state: ResearcherState, config: RunnableConfig):
             
             # Extract raw notes from all tool and AI messages
             raw_notes_content = "\n".join([
-                str(message.content) 
+                str(message.content)
                 for message in filter_messages(researcher_messages, include_types=["tool", "ai"])
             ])
-            
+
+            # Extract visualization plans from tool calls
+            viz_plans = get_visualization_plans_from_tool_calls(researcher_messages)
+
             # Return successful compression result
             return {
                 "compressed_research": str(response.content),
-                "raw_notes": [raw_notes_content]
+                "raw_notes": [raw_notes_content],
+                "visualization_plans": viz_plans
             }
             
         except Exception as e:
@@ -575,13 +588,17 @@ async def compress_research(state: ResearcherState, config: RunnableConfig):
     
     # Step 4: Return error result if all attempts failed
     raw_notes_content = "\n".join([
-        str(message.content) 
+        str(message.content)
         for message in filter_messages(researcher_messages, include_types=["tool", "ai"])
     ])
-    
+
+    # Extract visualization plans even on error
+    viz_plans = get_visualization_plans_from_tool_calls(researcher_messages)
+
     return {
         "compressed_research": "Error synthesizing research report: Maximum retries exceeded",
-        "raw_notes": [raw_notes_content]
+        "raw_notes": [raw_notes_content],
+        "visualization_plans": viz_plans
     }
 
 # Researcher Subgraph Construction
@@ -606,21 +623,32 @@ researcher_subgraph = researcher_builder.compile()
 
 async def final_report_generation(state: AgentState, config: RunnableConfig):
     """Generate the final comprehensive research report with retry logic for token limits.
-    
-    This function takes all collected research findings and synthesizes them into a 
+
+    This function takes all collected research findings and synthesizes them into a
     well-structured, comprehensive final report using the configured report generation model.
-    
+
     Args:
         state: Agent state containing research findings and context
         config: Runtime configuration with model settings and API keys
-        
+
     Returns:
         Dictionary containing the final report and cleared state
     """
     # Step 1: Extract research findings and prepare state cleanup
     notes = state.get("notes", [])
-    cleared_state = {"notes": {"type": "override", "value": []}}
+    visualization_plans = state.get("visualization_plans", [])
+    cleared_state = {
+        "notes": {"type": "override", "value": []},
+        "visualization_plans": {"type": "override", "value": []}
+    }
     findings = "\n".join(notes)
+
+    # Add visualization plans to findings if they exist
+    if visualization_plans:
+        viz_context = "\n\n<Visualization Plans from Research>\n"
+        viz_context += "\n".join(visualization_plans)
+        viz_context += "\n</Visualization Plans from Research>\n"
+        findings += viz_context
     
     # Step 2: Configure the final report generation model
     configurable = Configuration.from_runnable_config(config)

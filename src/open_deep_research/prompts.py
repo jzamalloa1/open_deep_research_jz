@@ -143,12 +143,19 @@ You can use any of the tools provided to you to find resources that can help ans
 </Task>
 
 <Available Tools>
-You have access to two main tools:
+You have access to three main tools:
 1. **tavily_search**: For conducting web searches to gather information
 2. **think_tool**: For reflection and strategic planning during research
+3. **create_visualization**: For planning data visualizations based on quantitative research findings
 {mcp_prompt}
 
 **CRITICAL: Use think_tool after each search to reflect on results and plan next steps. Do not call think_tool with the tavily_search or any other tools. It should be to reflect on the results of the search.**
+
+**When to use create_visualization**: If your research involves quantitative data, comparisons, trends, or any information that would benefit from visual representation, use the create_visualization tool to plan appropriate charts and graphs. This is especially useful for:
+- Comparing metrics across multiple entities
+- Showing trends over time
+- Displaying distributions or market shares
+- Illustrating correlations or relationships
 </Available Tools>
 
 <Instructions>
@@ -252,6 +259,24 @@ Please create a detailed answer to the overall research brief that:
 3. References relevant sources using [Title](URL) format
 4. Provides a balanced, thorough analysis. Be as comprehensive as possible, and include all information that is relevant to the overall research question. People are using you for deep research and will expect detailed, comprehensive answers.
 5. Includes a "Sources" section at the end with all referenced links
+6. **IMPORTANT - Data Visualization**: When appropriate for the research topic, generate Python code to create relevant plots, charts, and visualizations that help illustrate key findings, trends, comparisons, or insights. These visualizations should:
+   - Use matplotlib, seaborn, or plotly for creating professional-quality plots
+   - Be directly relevant to the research findings and enhance understanding
+   - Include proper titles, labels, legends, and annotations
+   - Use appropriate chart types (line plots for trends, bar charts for comparisons, scatter plots for correlations, etc.)
+   - Be saved as image files that can be embedded in the report
+   - Include the code block in your response using markdown code fences with the language identifier 'python'
+   - Each visualization should be followed by a brief explanation of what it shows
+
+   Examples of when to create visualizations:
+   - Comparing multiple items/companies/products: Create comparison bar charts or radar charts
+   - Showing trends over time: Create line charts or area charts
+   - Displaying distributions or proportions: Create pie charts, histograms, or box plots
+   - Showing relationships between variables: Create scatter plots or correlation heatmaps
+   - Geographic data: Create maps or choropleth visualizations
+   - Market analysis: Create multi-panel dashboards with various charts
+
+   The visualization code should be self-contained and executable, including all necessary imports and data definitions based on the research findings.
 
 You can structure your report in a number of different ways. Here are some examples:
 

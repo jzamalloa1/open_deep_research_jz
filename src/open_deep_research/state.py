@@ -64,33 +64,37 @@ class AgentInputState(MessagesState):
 
 class AgentState(MessagesState):
     """Main agent state containing messages and research data."""
-    
+
     supervisor_messages: Annotated[list[MessageLikeRepresentation], override_reducer]
     research_brief: Optional[str]
     raw_notes: Annotated[list[str], override_reducer] = []
     notes: Annotated[list[str], override_reducer] = []
+    visualization_plans: Annotated[list[str], override_reducer] = []
     final_report: str
 
 class SupervisorState(TypedDict):
     """State for the supervisor that manages research tasks."""
-    
+
     supervisor_messages: Annotated[list[MessageLikeRepresentation], override_reducer]
     research_brief: str
     notes: Annotated[list[str], override_reducer] = []
+    visualization_plans: Annotated[list[str], override_reducer] = []
     research_iterations: int = 0
     raw_notes: Annotated[list[str], override_reducer] = []
 
 class ResearcherState(TypedDict):
     """State for individual researchers conducting research."""
-    
+
     researcher_messages: Annotated[list[MessageLikeRepresentation], operator.add]
     tool_call_iterations: int = 0
     research_topic: str
     compressed_research: str
     raw_notes: Annotated[list[str], override_reducer] = []
+    visualization_plans: Annotated[list[str], override_reducer] = []
 
 class ResearcherOutputState(BaseModel):
     """Output state from individual researchers."""
-    
+
     compressed_research: str
     raw_notes: Annotated[list[str], override_reducer] = []
+    visualization_plans: Annotated[list[str], override_reducer] = []

@@ -244,6 +244,54 @@ def think_tool(reflection: str) -> str:
     return f"Reflection recorded: {reflection}"
 
 ##########################
+# Visualization Tool Utils
+##########################
+
+@tool(description="Create data visualizations from research findings")
+def create_visualization(
+    visualization_type: str,
+    data_description: str,
+    chart_title: str,
+    x_label: str = "",
+    y_label: str = "",
+) -> str:
+    """Create data visualizations to illustrate research findings.
+
+    This tool helps you plan and document what visualizations should be created
+    based on the research data. The actual plot generation will happen in the
+    final report generation phase using Python code.
+
+    Use this tool to:
+    - Plan relevant visualizations for your research findings
+    - Document what data should be visualized and how
+    - Suggest appropriate chart types for different types of data
+
+    Args:
+        visualization_type: Type of chart (e.g., 'bar', 'line', 'scatter', 'pie', 'heatmap', 'box', 'radar')
+        data_description: Detailed description of the data to visualize, including data points, values, and context
+        chart_title: Clear, descriptive title for the visualization
+        x_label: Label for x-axis (if applicable)
+        y_label: Label for y-axis (if applicable)
+
+    Returns:
+        Confirmation that visualization has been planned and will be generated in final report
+    """
+    viz_plan = (
+        f"Visualization planned:\n"
+        f"  Type: {visualization_type}\n"
+        f"  Title: {chart_title}\n"
+        f"  Data: {data_description}\n"
+    )
+    if x_label:
+        viz_plan += f"  X-axis: {x_label}\n"
+    if y_label:
+        viz_plan += f"  Y-axis: {y_label}\n"
+
+    viz_plan += "\nThis visualization will be generated as Python code in the final report."
+
+    return viz_plan
+
+##########################
 # MCP Utils
 ##########################
 
@@ -567,38 +615,55 @@ async def get_search_tool(search_api: SearchAPI):
     return []
     
 async def get_all_tools(config: RunnableConfig):
-    """Assemble complete toolkit including research, search, and MCP tools.
-    
+    """Assemble complete toolkit including research, search, visualization, and MCP tools.
+
     Args:
         config: Runtime configuration specifying search API and MCP settings
-        
+
     Returns:
         List of all configured and available tools for research operations
     """
     # Start with core research tools
-    tools = [tool(ResearchComplete), think_tool]
-    
+    tools = [tool(ResearchComplete), think_tool, create_visualization]
+
     # Add configured search tools
     configurable = Configuration.from_runnable_config(config)
     search_api = SearchAPI(get_config_value(configurable.search_api))
     search_tools = await get_search_tool(search_api)
     tools.extend(search_tools)
-    
+
     # Track existing tool names to prevent conflicts
     existing_tool_names = {
-        tool.name if hasattr(tool, "name") else tool.get("name", "web_search") 
+        tool.name if hasattr(tool, "name") else tool.get("name", "web_search")
         for tool in tools
     }
-    
+
     # Add MCP tools if configured
     mcp_tools = await load_mcp_tools(config, existing_tool_names)
     tools.extend(mcp_tools)
-    
+
     return tools
 
 def get_notes_from_tool_calls(messages: list[MessageLikeRepresentation]):
     """Extract notes from tool call messages."""
     return [tool_msg.content for tool_msg in filter_messages(messages, include_types="tool")]
+
+def get_visualization_plans_from_tool_calls(messages: list[MessageLikeRepresentation]):
+    """Extract visualization plans from tool call messages.
+
+    Args:
+        messages: List of messages to search through
+
+    Returns:
+        List of visualization plan strings from create_visualization tool calls
+    """
+    visualization_plans = []
+    for tool_msg in filter_messages(messages, include_types="tool"):
+        # Check if this is a visualization tool call
+        if hasattr(tool_msg, 'name') and tool_msg.name == "create_visualization":
+            visualization_plans.append(tool_msg.content)
+
+    return visualization_plans
 
 ##########################
 # Model Provider Native Websearch Utils
