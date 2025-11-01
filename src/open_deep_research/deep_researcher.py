@@ -20,13 +20,13 @@ from open_deep_research.configuration import (
     Configuration,
 )
 from open_deep_research.prompts import (
-    clarify_with_user_instructions,
-    compress_research_simple_human_message,
-    compress_research_system_prompt,
-    final_report_generation_prompt,
-    lead_researcher_prompt,
-    research_system_prompt,
-    transform_messages_into_research_topic_prompt,
+    clarify_with_user_instructions_jz_prompt,
+    compress_research_simple_human_message_jz_prompt,
+    compress_research_system_prompt_jz_prompt,
+    final_report_generation_prompt_jz_prompt,
+    lead_researcher_prompt_jz_prompt,
+    research_system_prompt_jz_prompt,
+    transform_messages_into_research_topic_prompt_jz_prompt,
 )
 from open_deep_research.state import (
     AgentInputState,
@@ -95,8 +95,8 @@ async def clarify_with_user(state: AgentState, config: RunnableConfig) -> Comman
     )
     
     # Step 3: Analyze whether clarification is needed
-    prompt_content = clarify_with_user_instructions.format(
-        messages=get_buffer_string(messages), 
+    prompt_content = clarify_with_user_instructions_jz_prompt.format(
+        messages=get_buffer_string(messages),
         date=get_today_str()
     )
     response = await clarification_model.ainvoke([HumanMessage(content=prompt_content)])
@@ -148,14 +148,14 @@ async def write_research_brief(state: AgentState, config: RunnableConfig) -> Com
     )
     
     # Step 2: Generate structured research brief from user messages
-    prompt_content = transform_messages_into_research_topic_prompt.format(
+    prompt_content = transform_messages_into_research_topic_prompt_jz_prompt.format(
         messages=get_buffer_string(state.get("messages", [])),
         date=get_today_str()
     )
     response = await research_model.ainvoke([HumanMessage(content=prompt_content)])
     
     # Step 3: Initialize supervisor with research brief and instructions
-    supervisor_system_prompt = lead_researcher_prompt.format(
+    supervisor_system_prompt = lead_researcher_prompt_jz_prompt.format(
         date=get_today_str(),
         max_concurrent_research_units=configurable.max_concurrent_research_units,
         max_researcher_iterations=configurable.max_researcher_iterations
@@ -406,8 +406,8 @@ async def researcher(state: ResearcherState, config: RunnableConfig) -> Command[
     }
     
     # Prepare system prompt with MCP context if available
-    researcher_prompt = research_system_prompt.format(
-        mcp_prompt=configurable.mcp_prompt or "", 
+    researcher_prompt = research_system_prompt_jz_prompt.format(
+        mcp_prompt=configurable.mcp_prompt or "",
         date=get_today_str()
     )
     
@@ -544,7 +544,7 @@ async def compress_research(state: ResearcherState, config: RunnableConfig):
     researcher_messages = state.get("researcher_messages", [])
     
     # Add instruction to switch from research mode to compression mode
-    researcher_messages.append(HumanMessage(content=compress_research_simple_human_message))
+    researcher_messages.append(HumanMessage(content=compress_research_simple_human_message_jz_prompt))
     
     # Step 3: Attempt compression with retry logic for token limit issues
     synthesis_attempts = 0
@@ -553,7 +553,7 @@ async def compress_research(state: ResearcherState, config: RunnableConfig):
     while synthesis_attempts < max_attempts:
         try:
             # Create system prompt focused on compression task
-            compression_prompt = compress_research_system_prompt.format(date=get_today_str())
+            compression_prompt = compress_research_system_prompt_jz_prompt.format(date=get_today_str())
             messages = [SystemMessage(content=compression_prompt)] + researcher_messages
             
             # Execute compression
@@ -667,7 +667,7 @@ async def final_report_generation(state: AgentState, config: RunnableConfig):
     while current_retry <= max_retries:
         try:
             # Create comprehensive prompt with all research context
-            final_report_prompt = final_report_generation_prompt.format(
+            final_report_prompt = final_report_generation_prompt_jz_prompt.format(
                 research_brief=state.get("research_brief", ""),
                 messages=get_buffer_string(state.get("messages", [])),
                 findings=findings,

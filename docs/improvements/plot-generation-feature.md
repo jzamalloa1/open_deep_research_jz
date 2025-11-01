@@ -25,7 +25,7 @@ Previously, the system only generated text-based reports. This enhancement allow
 
 **File**: [`src/open_deep_research/prompts.py:255-272`](../../src/open_deep_research/prompts.py#L255-L272)
 
-Added comprehensive instructions to the `final_report_generation_prompt` that guide the LLM to:
+Added comprehensive instructions to the `final_report_generation_prompt_jz_prompt` that guide the LLM to:
 - Generate Python visualization code when appropriate
 - Use matplotlib, seaborn, or plotly libraries
 - Include proper titles, labels, legends, and annotations
@@ -81,7 +81,7 @@ This enables visualization plans to be tracked and aggregated throughout the mul
 
 **File**: [`src/open_deep_research/prompts.py:145-159`](../../src/open_deep_research/prompts.py#L145-L159)
 
-Updated the `research_system_prompt` to inform researchers about the visualization tool:
+Updated the `research_system_prompt_jz_prompt` to inform researchers about the visualization tool:
 
 ```python
 <Available Tools>

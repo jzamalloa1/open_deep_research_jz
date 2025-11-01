@@ -1,6 +1,6 @@
 """System prompts and prompt templates for the Deep Research agent."""
 
-clarify_with_user_instructions="""
+clarify_with_user_instructions_jz_prompt="""
 These are the messages that have been exchanged so far from the user asking for the report:
 <Messages>
 {messages}
@@ -41,7 +41,7 @@ For the verification message when no clarification is needed:
 """
 
 
-transform_messages_into_research_topic_prompt = """You will be given a set of messages that have been exchanged so far between yourself and the user. 
+transform_messages_into_research_topic_prompt_jz_prompt = """You will be given a set of messages that have been exchanged so far between yourself and the user. 
 Your job is to translate these messages into a more detailed and concrete research question that will be used to guide the research.
 
 The messages that have been exchanged so far between yourself and the user are:
@@ -76,7 +76,7 @@ Guidelines:
 - If the query is in a specific language, prioritize sources published in that language.
 """
 
-lead_researcher_prompt = """You are a research supervisor. Your job is to conduct research by calling the "ConductResearch" tool. For context, today's date is {date}.
+lead_researcher_prompt_jz_prompt = """You are a research supervisor. Your job is to conduct research by calling the "ConductResearch" tool. For context, today's date is {date}.
 
 <Task>
 Your focus is to call the "ConductResearch" tool to conduct research against the overall research question passed in by the user. 
@@ -135,7 +135,7 @@ After each ConductResearch tool call, use think_tool to analyze the results:
 - Do NOT use acronyms or abbreviations in your research questions, be very clear and specific
 </Scaling Rules>"""
 
-research_system_prompt = """You are a research assistant conducting research on the user's input topic. For context, today's date is {date}.
+research_system_prompt_jz_prompt = """You are a research assistant conducting research on the user's input topic. For context, today's date is {date}.
 
 <Task>
 Your job is to use tools to gather information about the user's input topic.
@@ -191,7 +191,7 @@ After each search tool call, use think_tool to analyze the results:
 """
 
 
-compress_research_system_prompt = """You are a research assistant that has conducted research on a topic by calling several tools and web searches. Your job is now to clean up the findings, but preserve all of the relevant statements and information that the researcher has gathered. For context, today's date is {date}.
+compress_research_system_prompt_jz_prompt = """You are a research assistant that has conducted research on a topic by calling several tools and web searches. Your job is now to clean up the findings, but preserve all of the relevant statements and information that the researcher has gathered. For context, today's date is {date}.
 
 <Task>
 You need to clean up information gathered from tool calls and web searches in the existing messages.
@@ -229,11 +229,11 @@ The report should be structured like this:
 Critical Reminder: It is extremely important that any information that is even remotely relevant to the user's research topic is preserved verbatim (e.g. don't rewrite it, don't summarize it, don't paraphrase it).
 """
 
-compress_research_simple_human_message = """All above messages are about research conducted by an AI Researcher. Please clean up these findings.
+compress_research_simple_human_message_jz_prompt = """All above messages are about research conducted by an AI Researcher. Please clean up these findings.
 
 DO NOT summarize the information. I want the raw information returned, just in a cleaner format. Make sure all relevant information is preserved - you can rewrite findings verbatim."""
 
-final_report_generation_prompt = """Based on all the research conducted, create a comprehensive, well-structured answer to the overall research brief:
+final_report_generation_prompt_jz_prompt = """Based on all the research conducted, create a comprehensive, well-structured answer to the overall research brief:
 <Research Brief>
 {research_brief}
 </Research Brief>
@@ -334,7 +334,7 @@ Format the report in clear markdown with proper structure and include source ref
 """
 
 
-summarize_webpage_prompt = """You are tasked with summarizing the raw content of a webpage retrieved from a web search. Your goal is to create a summary that preserves the most important information from the original web page. This summary will be used by a downstream research agent, so it's crucial to maintain the key details without losing essential information.
+summarize_webpage_prompt_jz_prompt = """You are tasked with summarizing the raw content of a webpage retrieved from a web search. Your goal is to create a summary that preserves the most important information from the original web page. This summary will be used by a downstream research agent, so it's crucial to maintain the key details without losing essential information.
 
 Here is the raw content of the webpage:
 
